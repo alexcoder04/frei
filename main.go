@@ -46,9 +46,10 @@ var (
 	Version   = ""
 	CommitSHA = ""
 
-	longFormat  = flag.Bool("numbers", false, "print exact numbers")
-	dispVersion = flag.Bool("version", false, "display version")
+	dispHuman   = flag.Bool("h", false, "display human-readable numbers (implies -numbers)")
 	dispKey     = flag.Bool("key", false, "display color key")
+	dispVersion = flag.Bool("version", false, "display version and exit")
+	longFormat  = flag.Bool("numbers", false, "print numbers in addition to the chart")
 )
 
 func getTerminalWidth() int {
@@ -126,7 +127,12 @@ func calcDrawData(data MemData, barWidth float64) DrawData {
 	res.Cache = uint((data.Cached / data.MemTotal) * barWidth)
 	res.Shared = uint(((data.Shmem + data.SReclaimable) / data.MemTotal) * barWidth)
 	res.Buffers = uint((data.Buffers / data.MemTotal) * barWidth)
-	res.Used = uint(barWidth) - res.Free - res.Cache - res.Shared - res.Buffers
+	// this is the only value that can become negative due to rounding errors
+	if res.Free+res.Cache+res.Shared+res.Buffers >= uint(barWidth) {
+		res.Used = 0
+	} else {
+		res.Used = uint(barWidth) - res.Free - res.Cache - res.Shared - res.Buffers
+	}
 
 	res.SwapFree = uint((data.SwapFree / data.SwapTotal) * barWidth)
 	res.SwapUsed = uint(barWidth) - res.SwapFree
@@ -134,12 +140,23 @@ func calcDrawData(data MemData, barWidth float64) DrawData {
 	return res
 }
 
-func toMbStr(value float64) string {
+func toHumanStr(value float64, human bool) string {
+	if human {
+		units := []string{"K", "M", "G", "T", "P", "E", "Z", "Y"}
+		for _, unit := range units {
+			if value < 1024 {
+				return fmt.Sprint(uint(value), " ", unit)
+			}
+			value = value / 1024
+		}
+	}
 	return fmt.Sprint(uint(value/1024), " M")
 }
 
 func drawCharts(data DrawData, chartWidth int) {
+	// head
 	fmt.Println(" ╭" + strings.Repeat("─", chartWidth-2) + "╮")
+	// memory
 	fmt.Print(" │ Mem: ")
 	fmt.Print("\033[33m" + strings.Repeat("█", int(data.Used)) + "\033[0m")
 	fmt.Print("\033[35m" + strings.Repeat("█", int(data.Buffers)) + "\033[0m")
@@ -147,12 +164,14 @@ func drawCharts(data DrawData, chartWidth int) {
 	fmt.Print("\033[34m" + strings.Repeat("█", int(data.Cache)) + "\033[0m")
 	fmt.Print(strings.Repeat(" ", int(data.Free)))
 	fmt.Print(" │ \n")
+	// delimeter
 	fmt.Println(" ├" + strings.Repeat("─", chartWidth-2) + "┤ ")
-
+	// swap
 	fmt.Print(" │ Swp: ")
 	fmt.Print("\033[31m" + strings.Repeat("█", int(data.SwapUsed)) + "\033[0m")
 	fmt.Print("\033[0m" + strings.Repeat(" ", int(data.SwapFree)) + "\033[0m")
 	fmt.Print(" │ \n")
+	// tail
 	fmt.Println(" ╰" + strings.Repeat("─", chartWidth-2) + "╯")
 }
 
@@ -162,7 +181,7 @@ func printKey(chartWidth int) {
 	fmt.Println(" ╰" + strings.Repeat("─", chartWidth-2) + "╯")
 }
 
-func printValues(data MemData, chartWidth int) {
+func printNumbers(data MemData, chartWidth int, human bool) {
 	if chartWidth > 40 {
 		chartWidth = 40
 	}
@@ -179,16 +198,16 @@ func printValues(data MemData, chartWidth int) {
 		"Swap Free",
 	}
 	values := [10]string{
-		toMbStr(data.MemTotal),
-		toMbStr(data.MemTotal - data.MemFree - data.Buffers - data.Cached),
-		toMbStr(data.MemFree),
-		toMbStr(data.Shmem),
-		toMbStr(data.Buffers),
-		toMbStr(data.Cached + data.SReclaimable),
-		toMbStr(data.MemAvailable),
-		toMbStr(data.SwapTotal),
-		toMbStr(data.SwapTotal - data.SwapFree),
-		toMbStr(data.SwapFree),
+		toHumanStr(data.MemTotal, human),
+		toHumanStr(data.MemTotal-data.MemFree-data.Buffers-data.Cached, human),
+		toHumanStr(data.MemFree, human),
+		toHumanStr(data.Shmem, human),
+		toHumanStr(data.Buffers, human),
+		toHumanStr(data.Cached+data.SReclaimable, human),
+		toHumanStr(data.MemAvailable, human),
+		toHumanStr(data.SwapTotal, human),
+		toHumanStr(data.SwapTotal-data.SwapFree, human),
+		toHumanStr(data.SwapFree, human),
 	}
 	fmt.Println(" ╭─────────────┬" + strings.Repeat("─", chartWidth-16) + "╮")
 	for i := 0; i < len(labels); i++ {
@@ -234,7 +253,7 @@ func main() {
 	if *dispKey {
 		printKey(chartWidth)
 	}
-	if *longFormat {
-		printValues(data, chartWidth)
+	if *longFormat || *dispHuman {
+		printNumbers(data, chartWidth, *dispHuman)
 	}
 }
