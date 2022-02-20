@@ -17,7 +17,7 @@ bar chart.
 Make sure you have [Go](https://golang.org/doc/install.html) installed.
 
 ```sh
-git clone https://github.com/alexcoder04/frei
+git clone https://github.com/alexcoder04/frei.git
 cd frei
 go build .
 ```
