@@ -12,6 +12,11 @@ bar chart.
 
 ## Installation
 
+### Pre-compiled binaries
+
+Binaries for `i386`, `amd64` and `arm` are available on the [releases
+page](https://github.com/alexcoder04/frei/releases/latest).
+
 ### Compiling from source
 
 Make sure you have [Go](https://golang.org/doc/install.html) installed.
