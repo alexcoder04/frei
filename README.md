@@ -24,11 +24,11 @@ go build .
 
 ## Command-line options
 
-| option     | description                                  |
-|------------|----------------------------------------------|
-| `--help`   | show list of options                         |
-| `-h`       | human-readable numbers (implies ``-numbers`) |
-| `-key`     | display color key                            |
-| `-numbers` | print numbers in addition to the chart       |
-| `-version` | display version and exit                     |
+| option     | description                                 |
+|------------|---------------------------------------------|
+| `--help`   | show list of options                        |
+| `-h`       | human-readable numbers (implies `-numbers`) |
+| `-key`     | display color key                           |
+| `-numbers` | print numbers in addition to the chart      |
+| `-version` | display version and exit                    |
 
