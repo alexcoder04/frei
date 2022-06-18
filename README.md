@@ -12,6 +12,10 @@ bar chart.
 
 ## Installation
 
+### Arch Linux
+
+frei is available on the [AUR](https://aur.archlinux.org/packages/frei).
+
 ### Pre-compiled binaries
 
 Binaries for `i386`, `amd64` and `arm` are available on the [releases
@@ -31,7 +35,7 @@ go build .
 
 | option     | description                                 |
 |------------|---------------------------------------------|
-| `--help`   | show list of options                        |
+| `-help`    | show list of options                        |
 | `-h`       | human-readable numbers (implies `-numbers`) |
 | `-key`     | display color key                           |
 | `-numbers` | print numbers in addition to the chart      |

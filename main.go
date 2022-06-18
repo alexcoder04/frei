@@ -127,7 +127,7 @@ func main() {
 		if Version == "" {
 			fmt.Print("frei [built from source]")
 		} else {
-			fmt.Print("frei v" + Version)
+			fmt.Print("frei " + Version)
 		}
 		if CommitSHA != "" {
 			fmt.Print(" (commit " + CommitSHA + ")")
