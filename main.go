@@ -5,23 +5,22 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"strconv"
 	"strings"
-	"syscall"
-	"unsafe"
 )
 
+// types {{{
 type MemData struct {
 	Buffers      float64
 	Cached       float64
 	MemAvailable float64
 	MemFree      float64
 	MemTotal     float64
-	Shmem        float64
-	SReclaimable float64
+	Shared       float64
+	Used         float64
 
 	SwapFree  float64
 	SwapTotal float64
+	SwapUsed  float64
 }
 
 type DrawData struct {
@@ -42,6 +41,8 @@ type winsize struct {
 	Ypixel uint16
 }
 
+// }}}
+
 var (
 	Version   = ""
 	CommitSHA = ""
@@ -52,19 +53,7 @@ var (
 	longFormat  = flag.Bool("numbers", false, "print numbers in addition to the chart")
 )
 
-func getTerminalWidth() int {
-	ws := &winsize{}
-	retCode, _, errno := syscall.Syscall(syscall.SYS_IOCTL,
-		uintptr(syscall.Stdin),
-		uintptr(syscall.TIOCGWINSZ),
-		uintptr(unsafe.Pointer(ws)))
-
-	if int(retCode) == -1 {
-		panic(errno)
-	}
-	return int(ws.Col)
-}
-
+// collect and parse data {{{
 func readMemoryStats() MemData {
 	file, err := os.Open("/proc/meminfo")
 	if err != nil {
@@ -88,9 +77,9 @@ func readMemoryStats() MemData {
 		case "MemTotal":
 			res.MemTotal = value
 		case "Shmem":
-			res.Shmem = value
+			res.Shared += value
 		case "SReclaimable":
-			res.SReclaimable = value
+			res.Cached += value
 
 		case "SwapTotal":
 			res.SwapTotal = value
@@ -98,6 +87,10 @@ func readMemoryStats() MemData {
 			res.SwapFree = value
 		}
 	}
+
+	res.Used = res.MemTotal - res.MemFree - res.Buffers - res.Cached
+	res.SwapUsed = res.SwapTotal - res.SwapFree
+
 	return res
 }
 
@@ -109,16 +102,7 @@ func parseLine(raw string) (key string, value float64) {
 	return keyValue[0], toFloat(keyValue[1])
 }
 
-func toFloat(raw string) float64 {
-	if raw == "" {
-		return 0
-	}
-	res, err := strconv.ParseFloat(raw, 64)
-	if err != nil {
-		panic(err)
-	}
-	return res
-}
+// }}}
 
 func main() {
 	flag.Parse()
@@ -142,7 +126,7 @@ func main() {
 	barWidth := chartWidth - 4 - 5
 	drawData := calcDrawData(data, barWidth)
 
-	printCharts(drawData, chartWidth)
+	printCharts(drawData, chartWidth, data)
 	if *dispKey {
 		printKey(chartWidth)
 	}
