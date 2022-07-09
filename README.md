@@ -28,7 +28,9 @@ Make sure you have [Go](https://golang.org/doc/install.html) installed.
 ```sh
 git clone https://github.com/alexcoder04/frei.git
 cd frei
-go build .
+
+go build .    # builds a binary
+go install .  # builds and install a binary to your $GOPATH
 ```
 
 ## Command-line options
@@ -40,4 +42,9 @@ go build .
 | `-key`     | display color key                           |
 | `-numbers` | print numbers in addition to the chart      |
 | `-version` | display version and exit                    |
+
+## Contributing
+
+I appreciate any kind of improvement/feature ideas or bug reports. Don't
+hesitate to open an [issue](https://github.com/alexcoder04/frei/issues).
 
