@@ -14,7 +14,7 @@ bar chart using the same color-coding for as `htop`.
 
 ### Arch Linux
 
-frei is available on the [AUR](https://aur.archlinux.org/packages/frei).
+`frei` is available on the [AUR](https://aur.archlinux.org/packages/frei).
 
 ### Pre-compiled binaries
 
@@ -23,7 +23,7 @@ page](https://github.com/alexcoder04/frei/releases/latest).
 
 ### Compiling from source
 
-Make sure you have [Go](https://golang.org/doc/install.html) installed.
+Make sure you have [Go](https://go.dev/doc/install) installed.
 
 ```sh
 git clone https://github.com/alexcoder04/frei.git
@@ -50,7 +50,7 @@ hesitate to open an [issue](https://github.com/alexcoder04/frei/issues).
 
 ## FAQ
 
-### What is the differerence between "free" and "available"?
+### What is the differerence between "free" and "available" memory?
 
 For more detailed information, see [`free(1)`](https://man.archlinux.org/man/free.1).
 
