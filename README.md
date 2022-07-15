@@ -56,7 +56,7 @@ For more detailed information, see [`free(1)`](https://man.archlinux.org/man/fre
 
 "Free" (`MemFree` in `/proc/meminfo`) reports just the amount of memory that is
 currently not in use. "Available" (`MemAvailable` in `/proc/meminfo`), on the
-other side, is a more sophisticated calculation of how much memory is available
+other side, is a more sophisticated estimation of how much memory is available
 for starting new applications, without swapping. It takes into account the page
 size and how much of reclaimable memory can actually be reclaimed.
 
