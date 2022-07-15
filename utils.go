@@ -45,7 +45,7 @@ func toHumanStr(value float64, human bool) string {
 	units := []string{"K", "M", "G", "T", "P", "E", "Z", "Y"}
 	for _, unit := range units {
 		if value < 1024 {
-			return fmt.Sprint(uint(value), " ", unit)
+			return fmt.Sprintf("%.2f %s", value, unit)
 		}
 		value = value / 1024
 	}

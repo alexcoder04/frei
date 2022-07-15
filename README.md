@@ -8,7 +8,7 @@ should not be an exception.
 
 In case you didn't know, `free` shows your memory usage on Unix-based systems.
 `frei` obtains memory data from `/proc/meminfo` and represents it in a colored
-bar chart.
+bar chart using the same color-coding for as `htop`.
 
 ## Installation
 
@@ -47,4 +47,16 @@ go install .  # builds and install a binary to your $GOPATH
 
 I appreciate any kind of improvement/feature ideas or bug reports. Don't
 hesitate to open an [issue](https://github.com/alexcoder04/frei/issues).
+
+## FAQ
+
+### What is the differerence between "free" and "available"?
+
+For more detailed information, see [`free(1)`](https://man.archlinux.org/man/free.1).
+
+"Free" (`MemFree` in `/proc/meminfo`) reports just the amount of memory that is
+currently not in use. "Available" (`MemAvailable` in `/proc/meminfo`), on the
+other side, is a more sophisticated calculation of how much memory is available
+for starting new applications, without swapping. It takes into account the page
+size and how much of reclaimable memory can actually be reclaimed.
 

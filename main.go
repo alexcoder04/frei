@@ -43,6 +43,7 @@ type winsize struct {
 
 // }}}
 
+// args {{{
 var (
 	Version   = ""
 	CommitSHA = ""
@@ -53,7 +54,10 @@ var (
 	longFormat  = flag.Bool("numbers", false, "print numbers in addition to the chart")
 )
 
+// }}}
+
 // collect and parse data {{{
+// calculations are done the same way as in `free`
 func readMemoryStats() MemData {
 	file, err := os.Open("/proc/meminfo")
 	if err != nil {
@@ -66,20 +70,21 @@ func readMemoryStats() MemData {
 	for scanner.Scan() {
 		key, value := parseLine(scanner.Text())
 		switch key {
-		case "Buffers":
-			res.Buffers = value
-		case "Cached":
-			res.Cached = value
-		case "MemAvailable":
-			res.MemAvailable = value
-		case "MemFree":
-			res.MemFree = value
 		case "MemTotal":
 			res.MemTotal = value
+
+		case "Buffers":
+			res.Buffers = value
 		case "Shmem":
-			res.Shared += value
+			res.Shared = value
+		case "Cached":
+			res.Cached += value
 		case "SReclaimable":
 			res.Cached += value
+		case "MemFree":
+			res.MemFree = value
+		case "MemAvailable":
+			res.MemAvailable = value
 
 		case "SwapTotal":
 			res.SwapTotal = value
