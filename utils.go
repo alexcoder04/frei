@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"strconv"
 	"syscall"
 	"unsafe"
 )
@@ -19,20 +18,6 @@ func getTerminalWidth() int {
 		panic(errno)
 	}
 	return int(ws.Col)
-}
-
-// }}}
-
-// toFloat {{{
-func toFloat(raw string) float64 {
-	if raw == "" {
-		return 0
-	}
-	res, err := strconv.ParseFloat(raw, 64)
-	if err != nil {
-		panic(err)
-	}
-	return res
 }
 
 // }}}

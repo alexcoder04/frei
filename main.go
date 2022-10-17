@@ -1,11 +1,11 @@
 package main
 
 import (
-	"bufio"
 	"flag"
 	"fmt"
 	"os"
-	"strings"
+
+	"github.com/alexcoder04/meme"
 )
 
 // types {{{
@@ -56,59 +56,6 @@ var (
 
 // }}}
 
-// collect and parse data {{{
-// calculations are done the same way as in `free`
-func readMemoryStats() MemData {
-	file, err := os.Open("/proc/meminfo")
-	if err != nil {
-		panic(err)
-	}
-	defer file.Close()
-	scanner := bufio.NewScanner(file)
-
-	res := MemData{}
-	for scanner.Scan() {
-		key, value := parseLine(scanner.Text())
-		switch key {
-		case "MemTotal":
-			res.MemTotal = value
-
-		case "Buffers":
-			res.Buffers = value
-		case "Shmem":
-			res.Shared = value
-		case "Cached":
-			res.Cached += value
-		case "SReclaimable":
-			res.Cached += value
-		case "MemFree":
-			res.MemFree = value
-		case "MemAvailable":
-			res.MemAvailable = value
-
-		case "SwapTotal":
-			res.SwapTotal = value
-		case "SwapFree":
-			res.SwapFree = value
-		}
-	}
-
-	res.Used = res.MemTotal - res.MemFree - res.Buffers - res.Cached
-	res.SwapUsed = res.SwapTotal - res.SwapFree
-
-	return res
-}
-
-func parseLine(raw string) (key string, value float64) {
-	// remove "kB" at the end and remove spaces
-	text := strings.ReplaceAll(raw[:len(raw)-2], " ", "")
-	// split by the semicolon
-	keyValue := strings.Split(text, ":")
-	return keyValue[0], toFloat(keyValue[1])
-}
-
-// }}}
-
 func main() {
 	flag.Parse()
 
@@ -125,7 +72,10 @@ func main() {
 		os.Exit(0)
 	}
 
-	data := readMemoryStats()
+	data, err := meme.GetMemInfo()
+	if err != nil {
+		panic("Cannot get memory info")
+	}
 
 	chartWidth := getTerminalWidth() - 2
 	barWidth := chartWidth - 4 - 5

@@ -3,10 +3,12 @@ package main
 import (
 	"fmt"
 	"strings"
+
+	"github.com/alexcoder04/meme"
 )
 
 // calcDrawData() {{{
-func calcDrawData(data MemData, barWidth int) DrawData {
+func calcDrawData(data meme.MemData, barWidth int) DrawData {
 	res := DrawData{}
 
 	res.Used = uint((data.Used / data.MemTotal) * float64(barWidth))
@@ -36,7 +38,7 @@ func drawBar(width uint, number float64) string {
 // }}}
 
 // printCharts() {{{
-func printCharts(data DrawData, chartWidth int, stats MemData) {
+func printCharts(data DrawData, chartWidth int, stats meme.MemData) {
 	// head
 	fmt.Println(" ╭" + strings.Repeat("─", chartWidth-2) + "╮")
 
@@ -76,7 +78,7 @@ func printKey(chartWidth int) {
 // }}}
 
 // printNumbers() {{{
-func printNumbers(data MemData, chartWidth int, human bool) {
+func printNumbers(data meme.MemData, chartWidth int, human bool) {
 	if chartWidth > 40 {
 		chartWidth = 40
 	}
