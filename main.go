@@ -45,7 +45,7 @@ type winsize struct {
 
 // args {{{
 var (
-	Version   = ""
+	Version   = "[built from source]"
 	CommitSHA = ""
 
 	dispHuman   = flag.Bool("h", false, "display human-readable numbers (implies -numbers)")
@@ -60,13 +60,9 @@ func main() {
 	flag.Parse()
 
 	if *dispVersion {
-		if Version == "" {
-			fmt.Print("frei [built from source]")
-		} else {
-			fmt.Print("frei " + Version)
-		}
+		fmt.Printf("frei %s", Version)
 		if CommitSHA != "" {
-			fmt.Print(" (commit " + CommitSHA + ")")
+			fmt.Printf(" (commit %s)", CommitSHA)
 		}
 		fmt.Print("\n")
 		os.Exit(0)
