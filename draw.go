@@ -3,18 +3,16 @@ package main
 import (
 	"fmt"
 	"strings"
-
-	"github.com/alexcoder04/meme"
 )
 
 // calcDrawData() {{{
-func calcDrawData(data meme.MemData, barWidth int) DrawData {
+func calcDrawData(data MemData, barWidth int) DrawData {
 	res := DrawData{}
 
-	res.Used = uint((data.Used / data.MemTotal) * float64(barWidth))
-	res.Buffers = uint((data.Buffers / data.MemTotal) * float64(barWidth))
-	res.Shared = uint(((data.Shared) / data.MemTotal) * float64(barWidth))
-	res.Cache = uint((data.Cached / data.MemTotal) * float64(barWidth))
+	res.Used = uint((data.MemUsed / data.MemTotal) * float64(barWidth))
+	res.Buffers = uint((data.MemBuffers / data.MemTotal) * float64(barWidth))
+	res.Shared = uint((data.MemShared / data.MemTotal) * float64(barWidth))
+	res.Cache = uint((data.MemCached / data.MemTotal) * float64(barWidth))
 	res.Free = uint(barWidth) - res.Used - res.Buffers - res.Shared - res.Cache
 
 	res.SwapFree = uint((data.SwapFree / data.SwapTotal) * float64(barWidth))
@@ -38,17 +36,17 @@ func drawBar(width uint, number float64) string {
 // }}}
 
 // printCharts() {{{
-func printCharts(data DrawData, chartWidth int, stats meme.MemData) {
+func printCharts(data DrawData, chartWidth int, stats MemData) {
 	// head
 	fmt.Println(" ╭" + strings.Repeat("─", chartWidth-2) + "╮")
 
 	// memory
 	fmt.Print(" │ Mem: ")
 
-	fmt.Printf("\033[42;30m%s\033[0m", drawBar(data.Used, stats.Used))
-	fmt.Printf("\033[44;30m%s\033[0m", drawBar(data.Buffers, stats.Buffers))
-	fmt.Printf("\033[45;30m%s\033[0m", drawBar(data.Shared, stats.Shared))
-	fmt.Printf("\033[43;30m%s\033[0m", drawBar(data.Cache, stats.Cached))
+	fmt.Printf("\033[42;30m%s\033[0m", drawBar(data.Used, stats.MemUsed))
+	fmt.Printf("\033[45;30m%s\033[0m", drawBar(data.Shared, stats.MemShared))
+	fmt.Printf("\033[44;30m%s\033[0m", drawBar(data.Buffers, stats.MemBuffers))
+	fmt.Printf("\033[43;30m%s\033[0m", drawBar(data.Cache, stats.MemCached))
 
 	fmt.Print(strings.Repeat(" ", int(data.Free)))
 	fmt.Print(" │ \n")
@@ -71,37 +69,35 @@ func printCharts(data DrawData, chartWidth int, stats meme.MemData) {
 // printKey() {{{
 func printKey(chartWidth int) {
 	fmt.Println(" ╭" + strings.Repeat("─", chartWidth-2) + "╮")
-	fmt.Println(" │ \033[32mUsed\033[0m, \033[34mBuffers\033[0m, \033[35mShared\033[0m, \033[33mCache\033[0m" + strings.Repeat(" ", chartWidth-32) + " │")
+	fmt.Println(" │ \033[32mUsed\033[0m, \033[35mShared\033[0m, \033[34mBuffers\033[0m, \033[33mCache\033[0m" + strings.Repeat(" ", chartWidth-32) + " │")
 	fmt.Println(" ╰" + strings.Repeat("─", chartWidth-2) + "╯")
 }
 
 // }}}
 
 // printNumbers() {{{
-func printNumbers(data meme.MemData, chartWidth int, human bool) {
+func printNumbers(data MemData, chartWidth int, human bool) {
 	if chartWidth > 40 {
 		chartWidth = 40
 	}
 
-	labels := [10]string{
+	labels := [9]string{
 		"Total",
 		"Used",
-		"Buffers",
 		"Shared",
+		"Buffers",
 		"Cache",
-		"Free",
 		"Available",
 		"Swap Total",
 		"Swap Used",
 		"Swap Free",
 	}
-	values := [10]string{
+	values := [9]string{
 		toHumanStr(data.MemTotal, human),
-		toHumanStr(data.Used, human),
-		toHumanStr(data.Buffers, human),
-		toHumanStr(data.Shared, human),
-		toHumanStr(data.Cached, human),
-		toHumanStr(data.MemFree, human),
+		toHumanStr(data.MemUsed, human),
+		toHumanStr(data.MemShared, human),
+		toHumanStr(data.MemBuffers, human),
+		toHumanStr(data.MemCached, human),
 		toHumanStr(data.MemAvailable, human),
 		toHumanStr(data.SwapTotal, human),
 		toHumanStr(data.SwapUsed, human),

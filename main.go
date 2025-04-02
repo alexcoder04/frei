@@ -4,23 +4,20 @@ import (
 	"flag"
 	"fmt"
 	"os"
-
-	"github.com/alexcoder04/meme"
 )
 
 // types {{{
 type MemData struct {
-	Buffers      float64
-	Cached       float64
-	MemAvailable float64
-	MemFree      float64
 	MemTotal     float64
-	Shared       float64
-	Used         float64
+	MemUsed      float64
+	MemShared    float64
+	MemBuffers   float64
+	MemCached    float64
+	MemAvailable float64
 
 	SwapFree  float64
-	SwapTotal float64
 	SwapUsed  float64
+	SwapTotal float64
 }
 
 type DrawData struct {
@@ -68,7 +65,7 @@ func main() {
 		os.Exit(0)
 	}
 
-	data, err := meme.GetMemInfo()
+	data, err := GetMemInfo()
 	if err != nil {
 		panic("Cannot get memory info")
 	}
