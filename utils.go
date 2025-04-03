@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strconv"
 	"syscall"
 	"unsafe"
 )
@@ -35,6 +36,20 @@ func toHumanStr(value float64, human bool) string {
 		value = value / 1024
 	}
 	return "Too much"
+}
+
+// }}}
+
+// toFloat() {{{
+func toFloat(raw string) float64 {
+	if raw == "" {
+		return 0
+	}
+	res, err := strconv.ParseFloat(raw, 64)
+	if err != nil {
+		return 0
+	}
+	return res
 }
 
 // }}}

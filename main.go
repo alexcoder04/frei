@@ -21,14 +21,14 @@ type MemData struct {
 }
 
 type DrawData struct {
-	Buffers uint
-	Cache   uint
-	Free    uint
-	Shared  uint
-	Used    uint
+	Buffers int
+	Cache   int
+	Free    int
+	Shared  int
+	Used    int
 
-	SwapFree uint
-	SwapUsed uint
+	SwapFree int
+	SwapUsed int
 }
 
 type winsize struct {
@@ -74,10 +74,12 @@ func main() {
 	barWidth := chartWidth - 4 - 5
 	drawData := calcDrawData(data, barWidth)
 
-	printCharts(drawData, chartWidth, data)
+	printCharts(drawData, chartWidth, barWidth, data)
+
 	if *dispKey {
 		printKey(chartWidth)
 	}
+
 	if *longFormat || *dispHuman {
 		printNumbers(data, chartWidth, *dispHuman)
 	}

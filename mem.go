@@ -2,22 +2,12 @@ package main
 
 import (
 	"bufio"
+	"fmt"
 	"os"
-	"strconv"
 	"strings"
 )
 
-func toFloat(raw string) float64 {
-	if raw == "" {
-		return 0
-	}
-	res, err := strconv.ParseFloat(raw, 64)
-	if err != nil {
-		return 0
-	}
-	return res
-}
-
+// parseLine() {{{
 func parseLine(raw string) (string, float64) {
 	// remove "kB" at the end and remove spaces
 	text := strings.ReplaceAll(raw[:len(raw)-2], " ", "")
@@ -26,6 +16,10 @@ func parseLine(raw string) (string, float64) {
 	return keyValue[0], toFloat(keyValue[1])
 }
 
+// }}}
+
+// GetMemInfo() {{{
+// read memory data from /proc/meminfo and convert it into categories that make sense
 func GetMemInfo() (MemData, error) {
 	res := MemData{}
 
@@ -35,6 +29,10 @@ func GetMemInfo() (MemData, error) {
 	}
 	defer file.Close()
 	scanner := bufio.NewScanner(file)
+
+	// we use memory calculation mechanism from htop/procps
+	// https://github.com/htop-dev/htop/blob/3.4.0/linux/LinuxMachine.c#L200
+	// https://gitlab.com/procps-ng/procps/-/blob/v4.0.5/library/meminfo.c
 
 	var sreclaimable float64
 	var cached float64
@@ -80,5 +78,13 @@ func GetMemInfo() (MemData, error) {
 
 	res.SwapUsed = res.SwapTotal - res.SwapFree
 
+	// just to be on the safe side
+	if res.MemTotal <= 0 {
+		fmt.Println("Error: your total installed memory appears to be 0 or less.")
+		os.Exit(1)
+	}
+
 	return res, nil
 }
+
+// }}}

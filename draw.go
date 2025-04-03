@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"strings"
 )
 
@@ -9,14 +10,26 @@ import (
 func calcDrawData(data MemData, barWidth int) DrawData {
 	res := DrawData{}
 
-	res.Used = uint((data.MemUsed / data.MemTotal) * float64(barWidth))
-	res.Buffers = uint((data.MemBuffers / data.MemTotal) * float64(barWidth))
-	res.Shared = uint((data.MemShared / data.MemTotal) * float64(barWidth))
-	res.Cache = uint((data.MemCached / data.MemTotal) * float64(barWidth))
-	res.Free = uint(barWidth) - res.Used - res.Buffers - res.Shared - res.Cache
+	// this is a straightforward conversion of kb sizes into terminal block widths
+	res.Used = int((data.MemUsed / data.MemTotal) * float64(barWidth))
+	res.Buffers = int((data.MemBuffers / data.MemTotal) * float64(barWidth))
+	res.Shared = int((data.MemShared / data.MemTotal) * float64(barWidth))
+	res.Cache = int((data.MemCached / data.MemTotal) * float64(barWidth))
+	res.Free = barWidth - res.Used - res.Buffers - res.Shared - res.Cache
 
-	res.SwapFree = uint((data.SwapFree / data.SwapTotal) * float64(barWidth))
-	res.SwapUsed = uint(barWidth) - res.SwapFree
+	res.SwapFree = int((data.SwapFree / data.SwapTotal) * float64(barWidth))
+	res.SwapUsed = barWidth - res.SwapFree
+
+	// we want to be safe from weird edge cases (only god knows)
+	if res.Free < 0 {
+		if res.Used+res.Shared+res.Buffers > barWidth {
+			fmt.Println("Something very weird just happened.")
+			fmt.Println("You appear to be using way more memory that is installed on your system.")
+			os.Exit(1)
+		}
+		res.Free = 0
+		res.Cache = barWidth - res.Used - res.Shared - res.Buffers
+	}
 
 	return res
 }
@@ -25,18 +38,18 @@ func calcDrawData(data MemData, barWidth int) DrawData {
 
 // drawBar() {{{
 // draw a number if it fits in, otherwise empty bar
-func drawBar(width uint, number float64) string {
+func drawBar(width int, number float64) string {
 	human := toHumanStr(number, true)
 	if len(human)+2 > int(width) {
-		return strings.Repeat(" ", int(width))
+		return strings.Repeat(" ", width)
 	}
-	return fmt.Sprintf(" %s%s", human, strings.Repeat(" ", int(width)-1-len(human)))
+	return fmt.Sprintf(" %s%s", human, strings.Repeat(" ", width-1-len(human)))
 }
 
 // }}}
 
 // printCharts() {{{
-func printCharts(data DrawData, chartWidth int, stats MemData) {
+func printCharts(data DrawData, chartWidth int, barWidth int, stats MemData) {
 	// head
 	fmt.Println(" ╭" + strings.Repeat("─", chartWidth-2) + "╮")
 
@@ -56,8 +69,12 @@ func printCharts(data DrawData, chartWidth int, stats MemData) {
 
 	// swap
 	fmt.Print(" │ Swp: ")
-	fmt.Printf("\033[41m%s\033[0m", drawBar(data.SwapUsed, stats.SwapUsed))
-	fmt.Printf("\033[0m%s\033[0m", strings.Repeat(" ", int(data.SwapFree)))
+	if stats.SwapTotal > 0 {
+		fmt.Printf("\033[41m%s\033[0m", drawBar(data.SwapUsed, stats.SwapUsed))
+		fmt.Printf("\033[0m%s\033[0m", strings.Repeat(" ", int(data.SwapFree)))
+	} else {
+		fmt.Print(strings.Repeat(" ", barWidth))
+	}
 	fmt.Print(" │ \n")
 
 	// tail
@@ -106,12 +123,14 @@ func printNumbers(data MemData, chartWidth int, human bool) {
 
 	// head
 	fmt.Println(" ╭─────────────┬" + strings.Repeat("─", chartWidth-16) + "╮")
+
 	// body
 	for i := 0; i < len(labels); i++ {
 		// separator before swap
 		if i == len(labels)-3 {
 			fmt.Println(" ├─────────────┼" + strings.Repeat("─", chartWidth-16) + "┤")
 		}
+
 		spacesNumberLabel := 10 - len(labels[i])
 		spacesNumberValue := chartWidth - 19 - len(values[i])
 		fmt.Println(" │",
@@ -122,6 +141,7 @@ func printNumbers(data MemData, chartWidth int, human bool) {
 			values[i],
 			"│")
 	}
+
 	// tail
 	fmt.Println(" ╰─────────────┴" + strings.Repeat("─", chartWidth-16) + "╯")
 }
