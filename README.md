@@ -35,13 +35,12 @@ go install .  # builds and install a binary to your $GOPATH
 
 ## Command-line options
 
-| option     | description                                 |
-|------------|---------------------------------------------|
-| `-help`    | show list of options                        |
-| `-h`       | human-readable numbers (implies `-numbers`) |
-| `-key`     | display color key                           |
-| `-numbers` | print numbers in addition to the chart      |
-| `-version` | display version and exit                    |
+| option     | description                                       |
+|------------|---------------------------------------------------|
+| `-help`    | show list of options                              |
+| `-h`       | human-readable numbers (implies `-table`)         |
+| `-table`   | print table with numbers in addition to the chart |
+| `-version` | print version and exit                            |
 
 ## Contributing
 
