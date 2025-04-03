@@ -83,42 +83,47 @@ func printCharts(data DrawData, chartWidth int, barWidth int, stats MemData) {
 
 // }}}
 
-// printKey() {{{
-func printKey(chartWidth int) {
-	fmt.Println(" ╭" + strings.Repeat("─", chartWidth-2) + "╮")
-	fmt.Println(" │ \033[32mUsed\033[0m, \033[35mShared\033[0m, \033[34mBuffers\033[0m, \033[33mCache\033[0m" + strings.Repeat(" ", chartWidth-32) + " │")
-	fmt.Println(" ╰" + strings.Repeat("─", chartWidth-2) + "╯")
-}
-
-// }}}
-
 // printNumbers() {{{
-func printNumbers(data MemData, chartWidth int, human bool) {
+func printTable(data MemData, chartWidth int, human bool) {
 	if chartWidth > 40 {
 		chartWidth = 40
 	}
 
-	labels := [9]string{
+	labels := [10]string{
 		"Total",
 		"Used",
 		"Shared",
 		"Buffers",
 		"Cache",
 		"Available",
+		"Free",
 		"Swap Total",
 		"Swap Used",
 		"Swap Free",
 	}
-	values := [9]string{
+	values := [10]string{
 		toHumanStr(data.MemTotal, human),
 		toHumanStr(data.MemUsed, human),
 		toHumanStr(data.MemShared, human),
 		toHumanStr(data.MemBuffers, human),
 		toHumanStr(data.MemCached, human),
 		toHumanStr(data.MemAvailable, human),
+		toHumanStr(data.MemFree, human),
 		toHumanStr(data.SwapTotal, human),
 		toHumanStr(data.SwapUsed, human),
 		toHumanStr(data.SwapFree, human),
+	}
+	colors := [10]string{
+		"\033[1m",
+		"\033[32m",
+		"\033[35m",
+		"\033[34m",
+		"\033[33m",
+		"",
+		"",
+		"",
+		"",
+		"",
 	}
 
 	// head
@@ -133,13 +138,7 @@ func printNumbers(data MemData, chartWidth int, human bool) {
 
 		spacesNumberLabel := 10 - len(labels[i])
 		spacesNumberValue := chartWidth - 19 - len(values[i])
-		fmt.Println(" │",
-			labels[i],
-			strings.Repeat(" ", spacesNumberLabel),
-			"│",
-			strings.Repeat(" ", spacesNumberValue),
-			values[i],
-			"│")
+		fmt.Printf(" │ %s%s\033[0m%s  │ %s %s │\n", colors[i], labels[i], strings.Repeat(" ", spacesNumberLabel), strings.Repeat(" ", spacesNumberValue), values[i])
 	}
 
 	// tail

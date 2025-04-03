@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"path/filepath"
 )
 
 // types {{{
@@ -14,6 +15,7 @@ type MemData struct {
 	MemBuffers   float64
 	MemCached    float64
 	MemAvailable float64
+	MemFree      float64
 
 	SwapFree  float64
 	SwapUsed  float64
@@ -45,15 +47,18 @@ var (
 	Version   = "[built from source]"
 	CommitSHA = ""
 
-	dispHuman   = flag.Bool("h", false, "display human-readable numbers (implies -numbers)")
-	dispKey     = flag.Bool("key", false, "display color key")
+	dispHuman   = flag.Bool("h", false, "display human-readable numbers (implies -table)")
+	dispTable   = flag.Bool("table", false, "print table with numbers in addition to the chart")
 	dispVersion = flag.Bool("version", false, "display version and exit")
-	longFormat  = flag.Bool("numbers", false, "print numbers in addition to the chart")
 )
 
 // }}}
 
 func main() {
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "Usage:\n  %s [options]\n\nOptions:\n", filepath.Base(os.Args[0]))
+		flag.PrintDefaults()
+	}
 	flag.Parse()
 
 	if *dispVersion {
@@ -76,11 +81,7 @@ func main() {
 
 	printCharts(drawData, chartWidth, barWidth, data)
 
-	if *dispKey {
-		printKey(chartWidth)
-	}
-
-	if *longFormat || *dispHuman {
-		printNumbers(data, chartWidth, *dispHuman)
+	if *dispTable || *dispHuman {
+		printTable(data, chartWidth, *dispHuman)
 	}
 }

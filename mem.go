@@ -37,7 +37,7 @@ func GetMemInfo() (MemData, error) {
 	var sreclaimable float64
 	var cached float64
 	var shmem float64
-	var free float64
+	var memfree float64
 
 	for scanner.Scan() {
 		key, value := parseLine(scanner.Text())
@@ -57,7 +57,7 @@ func GetMemInfo() (MemData, error) {
 		case "Shmem":
 			shmem = value
 		case "MemFree":
-			free = value
+			memfree = value
 
 		case "SwapTotal":
 			res.SwapTotal = value
@@ -66,14 +66,15 @@ func GetMemInfo() (MemData, error) {
 		}
 	}
 
+	res.MemFree = memfree
 	res.MemShared = shmem
 	res.MemCached = cached + sreclaimable - shmem
 
-	usedDiff := free + cached + sreclaimable + res.MemBuffers
+	usedDiff := memfree + cached + sreclaimable + res.MemBuffers
 	if res.MemTotal >= usedDiff {
 		res.MemUsed = res.MemTotal - usedDiff
 	} else {
-		res.MemUsed = res.MemTotal - free
+		res.MemUsed = res.MemTotal - memfree
 	}
 
 	res.SwapUsed = res.SwapTotal - res.SwapFree
