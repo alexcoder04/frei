@@ -8,7 +8,7 @@ should not be an exception.
 
 In case you didn't know, `free` shows your memory usage on Unix-based systems.
 `frei` obtains memory data from `/proc/meminfo` and represents it in a colored
-bar chart using the same color-coding for as `htop`.
+bar chart (or other formats) using the same color-coding for as `htop`.
 
 ## Installation
 
@@ -35,12 +35,12 @@ go install .  # builds and install a binary to your $GOPATH
 
 ## Command-line options
 
-| option     | description                                       |
-|------------|---------------------------------------------------|
-| `-help`    | show list of options                              |
-| `-h`       | human-readable numbers (implies `-table`)         |
-| `-table`   | print table with numbers in addition to the chart |
-| `-version` | print version and exit                            |
+| option             | description                                       |
+|--------------------|---------------------------------------------------|
+| `-help`            | show list of options                              |
+| `-h`               | human-readable numbers                            |
+| `-format=FORMAT`   | output format (chart/table/charttable/plain/json) |
+| `-version`         | print version and exit                            |
 
 ## Contributing
 
@@ -58,4 +58,3 @@ currently not in use. "Available" (`MemAvailable` in `/proc/meminfo`), on the
 other side, is a more sophisticated estimation of how much memory is available
 for starting new applications, without swapping. It takes into account the page
 size and how much of reclaimable memory can actually be reclaimed.
-

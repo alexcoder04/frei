@@ -7,6 +7,41 @@ import (
 	"unsafe"
 )
 
+// types {{{
+type MemData struct {
+	MemTotal     float64
+	MemUsed      float64
+	MemShared    float64
+	MemBuffers   float64
+	MemCached    float64
+	MemAvailable float64
+	MemFree      float64
+
+	SwapFree  float64
+	SwapUsed  float64
+	SwapTotal float64
+}
+
+type DrawData struct {
+	Buffers int
+	Cache   int
+	Free    int
+	Shared  int
+	Used    int
+
+	SwapFree int
+	SwapUsed int
+}
+
+type winsize struct {
+	Row    uint16
+	Col    uint16
+	Xpixel uint16
+	Ypixel uint16
+}
+
+// }}}
+
 // getTerminalWidth() {{{
 func getTerminalWidth() int {
 	ws := &winsize{}

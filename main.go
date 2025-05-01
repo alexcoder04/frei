@@ -7,48 +7,13 @@ import (
 	"path/filepath"
 )
 
-// types {{{
-type MemData struct {
-	MemTotal     float64
-	MemUsed      float64
-	MemShared    float64
-	MemBuffers   float64
-	MemCached    float64
-	MemAvailable float64
-	MemFree      float64
-
-	SwapFree  float64
-	SwapUsed  float64
-	SwapTotal float64
-}
-
-type DrawData struct {
-	Buffers int
-	Cache   int
-	Free    int
-	Shared  int
-	Used    int
-
-	SwapFree int
-	SwapUsed int
-}
-
-type winsize struct {
-	Row    uint16
-	Col    uint16
-	Xpixel uint16
-	Ypixel uint16
-}
-
-// }}}
-
 // args {{{
 var (
 	Version   = "[built from source]"
 	CommitSHA = ""
 
-	dispHuman   = flag.Bool("h", false, "display human-readable numbers (implies -table)")
-	dispTable   = flag.Bool("table", false, "print table with numbers in addition to the chart")
+	format      = flag.String("format", "chart", "output format (chart/table/charttable/plain/json)")
+	dispHuman   = flag.Bool("h", false, "display human-readable numbers")
 	dispVersion = flag.Bool("version", false, "display version and exit")
 )
 
@@ -75,13 +40,19 @@ func main() {
 		panic("Cannot get memory info")
 	}
 
-	chartWidth := getTerminalWidth() - 2
-	barWidth := chartWidth - 4 - 5
-	drawData := calcDrawData(data, barWidth)
-
-	printCharts(drawData, chartWidth, barWidth, data)
-
-	if *dispTable || *dispHuman {
-		printTable(data, chartWidth, *dispHuman)
+	switch *format {
+	case "chart":
+		printCharts(data)
+	case "table":
+		printTable(data, *dispHuman)
+	case "charttable":
+		printCharts(data)
+		printTable(data, *dispHuman)
+	case "plain":
+		printPlainTextOutput(data, *dispHuman)
+	case "json":
+		printJsonOutput(data, *dispHuman)
+	default:
+		panic("Invalid format specified. Check -help for usage")
 	}
 }
