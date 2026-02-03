@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"strconv"
-	"syscall"
-	"unsafe"
+
+	"golang.org/x/term"
 )
 
 // types {{{
@@ -33,27 +34,15 @@ type DrawData struct {
 	SwapUsed int
 }
 
-type winsize struct {
-	Row    uint16
-	Col    uint16
-	Xpixel uint16
-	Ypixel uint16
-}
-
 // }}}
 
 // getTerminalWidth() {{{
 func getTerminalWidth() int {
-	ws := &winsize{}
-	retCode, _, errno := syscall.Syscall(syscall.SYS_IOCTL,
-		uintptr(syscall.Stdin),
-		uintptr(syscall.TIOCGWINSZ),
-		uintptr(unsafe.Pointer(ws)))
-
-	if int(retCode) == -1 {
-		panic(errno)
+	width, _, err := term.GetSize(int(os.Stdout.Fd()))
+	if err != nil {
+		return 80 // default fallback
 	}
-	return int(ws.Col)
+	return width
 }
 
 // }}}

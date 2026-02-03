@@ -4,32 +4,45 @@ PREFIX ?= /usr
 NAME = frei
 OUT_DIR = build
 
-TARGET_OS = linux
 VERSION = $(shell git describe --tags --abbrev=0)
 COMMIT = $(shell git rev-list -1 HEAD)
 
-build: amd64 386 arm
+build: linux-amd64 linux-386 linux-arm darwin-amd64 darwin-arm64
 
-amd64:
-	@echo "building amd64"
-	GOOS=$(TARGET_OS) GOARCH=amd64 \
+linux-amd64:
+	@echo "building linux-amd64"
+	GOOS=linux GOARCH=amd64 \
 		go build \
 		-ldflags "-X main.Version=$(VERSION) -X main.CommitSHA=$(COMMIT)" \
-		-o "$(OUT_DIR)/$(NAME)-$(TARGET_OS)-amd64" .
+		-o "$(OUT_DIR)/$(NAME)-linux-amd64" .
 
-386:
-	@echo "building 386"
-	GOOS=$(TARGET_OS) GOARCH=386 \
+linux-386:
+	@echo "building linux-386"
+	GOOS=linux GOARCH=386 \
 		go build \
 		-ldflags "-X main.Version=$(VERSION) -X main.CommitSHA=$(COMMIT)" \
-		-o "$(OUT_DIR)/$(NAME)-$(TARGET_OS)-386" .
+		-o "$(OUT_DIR)/$(NAME)-linux-386" .
 
-arm:
-	@echo "building arm"
-	GOOS=$(TARGET_OS) GOARCH=arm \
+linux-arm:
+	@echo "building linux-arm"
+	GOOS=linux GOARCH=arm \
 		go build \
 		-ldflags "-X main.Version=$(VERSION) -X main.CommitSHA=$(COMMIT)" \
-		-o "$(OUT_DIR)/$(NAME)-$(TARGET_OS)-arm" .
+		-o "$(OUT_DIR)/$(NAME)-linux-arm" .
+
+darwin-amd64:
+	@echo "building darwin-amd64"
+	GOOS=darwin GOARCH=amd64 \
+		go build \
+		-ldflags "-X main.Version=$(VERSION) -X main.CommitSHA=$(COMMIT)" \
+		-o "$(OUT_DIR)/$(NAME)-darwin-amd64" .
+
+darwin-arm64:
+	@echo "building darwin-arm64"
+	GOOS=darwin GOARCH=arm64 \
+		go build \
+		-ldflags "-X main.Version=$(VERSION) -X main.CommitSHA=$(COMMIT)" \
+		-o "$(OUT_DIR)/$(NAME)-darwin-arm64" .
 
 clean:
 	$(RM) -r $(OUT_DIR)
